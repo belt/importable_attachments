@@ -2,7 +2,7 @@
 # instance-deltas
 module ImportableAttachments
   class Version < ActiveRecord::Base
-    attr_accessible :event, :item_id, :item_type, :object, :whodunit
+    attr_accessible :event, :item_id, :item_type, :object, :whodunnit
 
     include SmarterDates if ::Configuration.for('smarter_dates').enabled
     include Rails::MarkRequirements if ::Configuration.for('mark_requirements').enabled
@@ -11,7 +11,8 @@ module ImportableAttachments
 
     # NOTE: to save nested-model forms, new instances must be valid. Therefore,
     #       attachable_id = nil must be valid when attachable is != nil
-    validates :item_id, if: :item_id?, numericality: {only_integer: true, greater_than: 0}
+    #validates :item_id, if: :item_id?, numericality: {only_integer: true, greater_than: 0}
+    validates :item_id, alpha_numeric: {punctuation: true}, if: :item_id?
 
     validates :item_type, alpha_numeric: {punctuation: true}, if: :item_type?
 
