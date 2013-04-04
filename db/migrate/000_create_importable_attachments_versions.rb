@@ -8,7 +8,7 @@ class CreateImportableAttachmentsVersions < ActiveRecord::Migration
       t.text :object
       t.datetime :created_at
     end
-    add_index :versions, [:item_type, :item_id]
+    add_index :importable_attachments_versions, [:item_type, :item_id]
   end
 end
 
