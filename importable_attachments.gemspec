@@ -7,8 +7,14 @@ require 'importable_attachments/version'
 
 REQUIREMENTS = {
   runtime: {
+    :'haml-rails' => ['>= 0.4'],
     paper_trail: ['>= 2.7.1'],
     paperclip: ['>= 3.4.1'],
+    configuration: ['>= 1.3.2'],
+    smarter_dates: ['>= 0.2.9'],
+    :'rspec-paper_trail' => ['>= 0.0.9'],
+    :'rails-mark_requirements' => ['>= 0.0.1'],
+    :'rails-alpha_numeric_validator' => ['>= 0.0.1'],
     rails: ['~> 3.2.13'] },
   development: {
     bundler: ['~> 1.3'],
@@ -18,6 +24,7 @@ REQUIREMENTS = {
     rspec: ['>= 2.13.0'],
     mocha: ['>= 0.13.0'],
     database_cleaner: ['>= 0.9.1'],
+    machinist: ['>= 2.0.0'],
     :'rspec-rails' => ['>= 2.12.0'],
     valid_attribute: ['>= 1.3.1'] }
 }

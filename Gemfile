@@ -14,6 +14,13 @@ gem 'rubygems-bundler'
 # jquery-rails is used by the dummy application
 gem 'jquery-rails'
 
+# needed by the models simply to run rspec
+gem 'configuration'
+gem 'smarter_dates'
+gem 'rails-mark_requirements'
+gem 'rails-alpha_numeric_validator'
+gem 'haml-rails'
+
 group :development, :test do
   gem 'debugger'
 end
