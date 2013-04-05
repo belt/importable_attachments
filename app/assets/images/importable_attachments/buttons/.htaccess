@@ -1,0 +1,5 @@
+<IfModule expires_module>
+  ExpiresActive On
+  ExpiresDefault A86400
+</IfModule>
+
