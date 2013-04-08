@@ -1,0 +1,9 @@
+%tr.group_data
+  - img_tag = image_tag '/assets/importable_attachments/buttons/download_32.png', alt: "Download #{attachment.io_stream_file_name}", title: "Download #{attachment.io_stream_file_name.inspect}", id: "icon_file_download_#{attachment.id}", :class => 'faux_link'
+  %td.text_col{style: 'text-align: center;'}= link_to img_tag, attachment.io_stream.url
+  %td.text_col= link_to attachment.io_stream_file_name, attachment, title: "View metadata for #{attachment.io_stream_file_name.inspect}", alt: "View metadata for #{attachment.io_stream_file_name.inspect}"
+  %td.text_col{style: 'text-align: center;'}= attachment.revision_number
+  %td.text_col= attachment.updated_at.strftime('%Y-%m-%d %I:%M %p')
+  %td.action_col= link_to 'Edit', edit_attachment_path(attachment)
+  %td.action_col= link_to 'Destroy', attachment, confirm: 'Are you sure?', method: :delete
+

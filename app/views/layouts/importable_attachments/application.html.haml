@@ -1,0 +1,48 @@
+!!! 1.1
+%html{lang: 'en', 'xml:lang' => 'en', xmlns: 'http://www.w3.org/1999/xhtml'}
+  %head
+    %meta{content: 'text/html; charset=utf-8', :'http-equiv' => 'Content-type'}/
+    %meta{name: 'document-rights', content: 'Copyrighted Work'}
+    %meta{name: 'Copyright', content: 'Copyright (c) Paul Belt'}
+    %meta{name: 'Rating', content: 'General'}
+    %meta{name: 'Keywords', content: 'attachments upload download'}
+    %meta{name: 'Description', content: 'Attachments Engine'}
+    %meta{name: 'csrf-token_name', content: request_forgery_protection_token}
+    %meta{name: 'csrf-token', content: form_authenticity_token}
+    %meta{name: 'csrf-param', content: 'authenticity_token'}
+
+    %title Attachments
+
+    = stylesheet_link_tag 'importable_attachments/application', media: 'all', charset: 'utf-8'
+    = javascript_include_tag 'importable_attachments/application', charset: 'utf-8'
+
+    /[if IE 6]
+      = stylesheet_link_tag 'formtastic_ie6'
+    /[if IE 7]
+      = stylesheet_link_tag 'formtastic_ie7'
+
+    - if protect_against_forgery?
+      = csrf_meta_tags # this must be last
+
+  %body{:class => body_class}
+    #flash
+      - flash.each do |key, value|
+        %div{:id => "flash_#{key}"}
+          %p{:style => 'float:right;'}
+            = link_to_function 'X', "Effect.Fade('flash_#{key}')"
+          %ul
+            - if value.is_a?(Hash)
+              %li.message
+                = h value[:message]
+              %li.flash_followup_action
+                = h value[:followup]
+            - else
+              %li.message
+                = h value
+          .clear
+
+    #contents
+      %noscript.noscript
+        %p Please enable JavaScript for a better experience.
+
+      = yield

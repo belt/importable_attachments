@@ -16,6 +16,9 @@ REQUIREMENTS = {
     :'rspec-paper_trail' => ['>= 0.0.9'],
     :'rails-mark_requirements' => ['>= 0.0.1'],
     :'rails-alpha_numeric_validator' => ['>= 0.0.1'],
+    formtastic: ['>= 2.2.1'],
+    remotipart: ['>= 1.0.5'],
+    roo: ['>= 1.10.1'],
     rails: ['~> 3.2.13'] },
   development: {
     bundler: ['~> 1.3'],
