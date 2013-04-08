@@ -30,6 +30,10 @@ REQUIREMENTS = {
     database_cleaner: ['>= 0.9.1'],
     machinist: ['>= 2.0.0'],
     :'rspec-rails' => ['>= 2.12.0'],
+    :'cucumber-rails' => ['>= 1.2.3'],
+    poltergeist: ['< 1.1.0'],
+    capybara: ['< 2.0.0'],
+    launchy: ['>= 2.2.0'],
     valid_attribute: ['>= 1.3.1'] }
 }
 

@@ -24,7 +24,7 @@
     - if protect_against_forgery?
       = csrf_meta_tags # this must be last
 
-  %body{:class => body_class}
+  %body
     #flash
       - flash.each do |key, value|
         %div{:id => "flash_#{key}"}
