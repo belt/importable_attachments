@@ -12,7 +12,7 @@ REQUIREMENTS = {
     paperclip: ['>= 3.4.1'],
     configuration: ['>= 1.3.2'],
     smarter_dates: ['>= 0.2.9'],
-    :'ruby-filemagic': ['>= 0.4.2'],
+    :'ruby-filemagic' => ['>= 0.4.2'],
     :'rspec-paper_trail' => ['>= 0.0.9'],
     :'rails-mark_requirements' => ['>= 0.0.1'],
     :'rails-alpha_numeric_validator' => ['>= 0.0.1'],
