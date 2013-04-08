@@ -40,7 +40,6 @@ module ImportableAttachments
     desc 'Generates initialization files.'
 
     def generate_configuration_files
-      migration_template 'migrations/create_attachments.rb', 'db/migrate/create_attachments.rb'
       template 'features/attachments.rb.erb', 'config/features/attachments.rb'
       copy_file 'initializers/paperclip.rb', 'config/initializers/paperclip.rb'
     end
@@ -56,23 +55,5 @@ module ImportableAttachments
     def use_versioned_filename?
       options.with_revision_in_filename?
     end
-
-    def deprecated_use_string_ids?
-      options.with_string_ids?
-    end
-
-    def deprecated_connected?
-      ActiveRecord::Base.connected?
-    end
-
-    def deprecated_migrated?
-      true if ActiveRecord::Base.connection.table_exists? 'versions'
-    end
-
-    def deprecated_has_integer_column?
-      return false unless migrated?
-      Version.columns.select { |obj| obj.name == 'item_id' }.first.try(:type) == :integer
-    end
   end
-
 end
