@@ -20,18 +20,13 @@ module ImportableAttachments
       validate :valid_item_type?, if: :item_type?
 
       def valid_item_type?
-        begin
-          types = item_type.split(/::/)
-          return false unless types.all? { |obj| Module.constants.include?(obj.to_sym) }
-          valid_namespace = types[1 .. -1].each_with_index { |obj, i|
-            types[0 .. i].join('::').constantize.constants.include? obj.to_sym
-          }.all? { |obj| obj }
-          errors.add :item_type, 'unknown module or class' unless valid_namespace
-          return valid_namespace
-        rescue NameError => err
-          errors.add :item_type, err.message
-          return false
+        types = item_type.split(/::/).map(&:to_sym)
+        item_type_result = types.inject(Module) do |constant, name|
+          constant.const_get(name) if constant && constant.constants.include?(name)
         end
+        valid_namespace = item_type_result.present?
+        errors.add :item_type, 'unknown module or class' unless valid_namespace
+        return valid_namespace
       end
     end
 
