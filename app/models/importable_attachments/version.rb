@@ -2,7 +2,7 @@
 # instance-deltas
 module ImportableAttachments
   class Version < ActiveRecord::Base
-    attr_accessible :event, :item_id, :item_type, :object, :whodunnit
+    attr_accessible :event, :item_id, :item_type, :object, :object_changes, :whodunnit
 
     include SmarterDates if ::Configuration.for('smarter_dates').enabled
     include Rails::MarkRequirements if ::Configuration.for('mark_requirements').enabled
