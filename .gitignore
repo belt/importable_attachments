@@ -2,7 +2,8 @@
 *.rbc
 *.sassc
 .rspec
-.sass-cache
+.rvmrc
+.sass-cache?
 /.bundle
 /coverage/
 /db/*.sqlite3
