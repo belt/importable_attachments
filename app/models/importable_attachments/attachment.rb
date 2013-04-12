@@ -49,25 +49,7 @@ module ImportableAttachments
     validates :attachable_id, :if => :attachable_id?,
       :numericality => {only_integer: true, greater_than: 0}
 
-    validates :attachable_type, alpha_numeric: {punctuation: true}, :if => :attachable_type?
-    validate :valid_attachable_type?, :if => :attachable_type?
-
-    def valid_attachable_type?
-      begin
-        # NOTE: Trying to constantize the attachable_type should error on the
-        # case where the attachable_type polymorph class no longer exists. Also,
-        # namespaced-constant look-ups are a bit funky in ruby. Module.const_get
-        # work well for non-namespaced polymorphs.
-        unless defined?(attachable_type) && attachable_type.try(:constantize)
-          errors.add(:attachable_type, 'unknown polymorph attachable_type')
-          return false
-        end
-      rescue NameError => err
-        errors.add(:attachable_type, err.message)
-        return false
-      end
-      true
-    end
+    validates :attachable_type, alpha_numeric: {punctuation: true}, existing_class: true, :if => :attachable_type?
 
     validates_attachment :io_stream, :presence => true,
       :size => {greater_than: 0}
