@@ -1,3 +1,4 @@
+#require 'validators/existing_class_validator'
 # versions are managed by the paper_trail gem... providing a history of
 # instance-deltas
 module ImportableAttachments
@@ -17,17 +18,7 @@ module ImportableAttachments
     validates :item_type, alpha_numeric: {punctuation: true}, if: :item_type?
 
     if ::Configuration.for('versioning').validate_item_type_constants
-      validate :valid_item_type?, if: :item_type?
-
-      def valid_item_type?
-        types = item_type.split(/::/).map(&:to_sym)
-        item_type_result = types.inject(Module) do |constant, name|
-          constant.const_get(name) if constant && constant.constants.include?(name)
-        end
-        valid_namespace = item_type_result.present?
-        errors.add :item_type, 'unknown module or class' unless valid_namespace
-        return valid_namespace
-      end
+      validates :item_type, existing_class: true, if: :item_type?
     end
 
     # :call-seq:
