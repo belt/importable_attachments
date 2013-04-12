@@ -34,7 +34,7 @@ module ImportableAttachments
     # Version. As you add validations to Version, be sure to
     # update the return value of this method accordingly.
     def valid_attributes
-      { item_type: 'MyString', item_id: 27, event: 'update' }
+      { item_type: 'Attachment', item_id: 27, event: 'update' }
     end
 
     # This should return the minimal set of values that should be in the session
