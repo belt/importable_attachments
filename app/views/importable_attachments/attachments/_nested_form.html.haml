@@ -1,0 +1,20 @@
+= javascript_include_tag 'importable_attachments/attachments'
+
+#spreadsheet_action_panel.actions_menu
+  = image_tag '/assets/importable_attachments/buttons/upload_32.png', alt: 'Upload File', title: 'Upload File', id: 'icon_file_upload', :class => 'faux_link'
+
+  - if attachment.new_record?
+    = image_tag '/assets/importable_attachments/buttons/download_32.png', alt: 'No File to Download', title: 'No File to Download', id: 'icon_file_download', :class => 'faux_link'
+  - else
+    - img_tag = image_tag '/assets/importable_attachments/buttons/download_32.png', alt: 'Download Original File', title: 'Download Original File', id: 'icon_file_download', :class => 'faux_link'
+    =link_to img_tag, attachment.io_stream_url
+
+%li
+  %label.label File name
+  %input#file_name{disabled: 'disabled', value: attachment.io_stream_file_name}
+  = f.inputs id: 'attachment_attributes_io_stream_fields' do
+    - opts = { as: :file, id: 'attachment_io_stream_input' }
+    = f.semantic_fields_for :attachment do |attachment_form|
+      - opts.merge! required: attachment_form.object.mark_required?(:io_stream) if ::Configuration.for('mark_requirements').enabled
+      = attachment_form.inputs do
+        = attachment_form.input :io_stream, opts

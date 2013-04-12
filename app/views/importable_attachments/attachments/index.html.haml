@@ -1,0 +1,23 @@
+%h2 Attachments
+
+= semantic_form_for Attachment.new, url: attachments_path, html: {multipart: true} do |f|
+  = f.inputs do
+    = render 'form', f: f, attachment: f.object
+
+    = f.action :submit, input_html: { value: 'Upload File', onclick: "this.disabled=true;this.value='Please wait...';this.form.submit();" }
+
+%table#resource_table{alt: 'Attachments'}
+  %thead
+    %tr
+      %th Download
+      %th File Name
+      %th Version
+      %th Last Modified
+      %th.action_col_header{colspan: 2} Actions
+
+  %tbody
+    = render @attachments
+
+%br/
+= link_to 'New Attachment', new_attachment_path, title: 'New Attachment'
+

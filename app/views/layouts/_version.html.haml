@@ -1,0 +1,33 @@
+- current_version = collection.last || Version.new
+%h3
+  Current Version: #{collection.length}
+
+%b Created At:
+= current_version.created_at
+
+%br/
+= succeed ':' do
+  %b Admin
+
+%br/
+- if collection.length.to_i > 1
+  - if params[:version].to_i > 1 || !params[:version]
+    = link_to 'Previous version', {version: (params[:version] || collection.length).to_i - 1}
+
+    %br/
+
+  - if params[:version]
+    %h3
+      This is #{params[:version]} version
+
+    %b Modify at:
+    = collection[(params[:version].to_i - 1)].created_at
+
+    %br/
+
+    = succeed ':' do
+      %b Admin
+
+    %br/
+    = link_to 'Go to current version'
+

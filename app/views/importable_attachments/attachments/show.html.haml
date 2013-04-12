@@ -1,0 +1,43 @@
+%h2 Attachment #{@attachment.io_stream_file_name}
+
+#spreadsheet_action_panel.actions_menu
+  - img_tag = image_tag '/assets/importable_attachments/buttons/download_32.png', alt: 'Download Original File', title: 'Download Original File', id: 'icon_file_download', :class => 'faux_link'
+  =link_to img_tag, @attachment.io_stream.url, title: @attachment.io_stream_file_name, alt: @attachment.io_stream_file_name
+
+- if @attachment.attachable_type
+  %p
+    %b Represents:
+    = "#{@attachment.attachable_type} id: #{@attachment.attachable_id}"
+
+%p
+  %b File Name:
+  =link_to @attachment.io_stream_file_name, @attachment.io_stream.url, title: @attachment.io_stream_file_name, alt: @attachment.io_stream_file_name
+
+- if %w(development test).include?(Rails.env)
+  %p
+    %b File Path:
+    =link_to @attachment.io_stream.path.sub(Rails.root.to_s + '/', ""), File.dirname(@attachment.io_stream.path)
+
+%p
+  %b File Size:
+  = "#{@attachment.io_stream_file_size} bytes"
+
+%p
+  %b Content Type:
+  = @attachment.io_stream_mime_type.try(:simplified) || 'Unknown'
+
+%p
+  %b Version:
+  = @attachment.revision_number
+
+%p
+  %b Last Modified:
+  = @attachment.updated_at.strftime('%Y-%m-%d %I:%M %p')
+
+%br/
+= link_to 'Edit', edit_attachment_path(@attachment)
+|
+= link_to 'Destroy', @attachment, confirm: 'Are you sure?', method: :delete
+|
+= link_to 'View All Attachments', attachments_path
+

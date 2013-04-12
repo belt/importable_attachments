@@ -7,8 +7,18 @@ require 'importable_attachments/version'
 
 REQUIREMENTS = {
   runtime: {
+    :'haml-rails' => ['>= 0.4'],
     paper_trail: ['>= 2.7.1'],
     paperclip: ['>= 3.4.1'],
+    configuration: ['>= 1.3.2'],
+    smarter_dates: ['>= 0.2.9'],
+    :'ruby-filemagic' => ['>= 0.4.2'],
+    :'rspec-paper_trail' => ['>= 0.0.9'],
+    :'rails-mark_requirements' => ['>= 0.0.1'],
+    :'rails-alpha_numeric_validator' => ['>= 0.0.1'],
+    formtastic: ['>= 2.2.1'],
+    remotipart: ['>= 1.0.5'],
+    roo: ['>= 1.10.1'],
     rails: ['~> 3.2.13'] },
   development: {
     bundler: ['~> 1.3'],
@@ -18,7 +28,12 @@ REQUIREMENTS = {
     rspec: ['>= 2.13.0'],
     mocha: ['>= 0.13.0'],
     database_cleaner: ['>= 0.9.1'],
+    machinist: ['>= 2.0.0'],
     :'rspec-rails' => ['>= 2.12.0'],
+    :'cucumber-rails' => ['>= 1.2.3'],
+    poltergeist: ['< 1.1.0'],
+    capybara: ['< 2.0.0'],
+    launchy: ['>= 2.2.0'],
     valid_attribute: ['>= 1.3.1'] }
 }
 

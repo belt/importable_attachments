@@ -1,0 +1,39 @@
+%h2 Editing Attachment #{@attachment.io_stream_file_name}
+
+= semantic_form_for @attachment, url: attachment_path(@attachment), html: {multipart: true} do |f|
+  = f.inputs do
+    = render 'form', f: f, attachment: @attachment
+
+    = f.action :submit, input_html: { value: 'Upload File', onclick: "this.disabled=true;this.value='Please wait...';this.form.submit();" }
+
+- if @attachment.attachable_type
+  %p
+    %b Represents:
+    = "#{@attachment.attachable_type} id: #{@attachment.attachable_id}"
+
+%p
+  %b File Name:
+  =link_to @attachment.io_stream_file_name, @attachment.io_stream.url, title: @attachment.io_stream_file_name, alt: @attachment.io_stream_file_name
+
+- if %w(development test).include?(Rails.env)
+  %p
+    %b File Path:
+    =link_to @attachment.io_stream.path.sub(Rails.root.to_s + '/', ""), File.dirname(@attachment.io_stream.path)
+
+%p
+  %b File Size:
+  = "#{@attachment.io_stream_file_size} bytes"
+
+%p
+  %b Content Type:
+  = @attachment.io_stream.content_type
+
+%p
+  %b Version:
+  = @attachment.revision_number
+
+%br/
+= link_to 'Show', @attachment
+|
+= link_to 'View All Attachments', attachments_path
+

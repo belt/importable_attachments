@@ -1,0 +1,21 @@
+%p#notice= notice
+
+%p
+  %b Item type:
+  = @version.item_type
+%p
+  %b Item:
+  = @version.item_id
+%p
+  %b Event:
+  = @version.event
+%p
+  %b Whodunit:
+  = @version.whodunit
+%p
+  %b Object:
+  = @version.object
+
+= link_to 'Edit', edit_version_path(@version)
+\|
+= link_to 'Back', versions_path

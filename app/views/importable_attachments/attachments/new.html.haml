@@ -1,0 +1,10 @@
+%h2 New Attachment
+
+= semantic_form_for @attachment, url: attachments_path, html: {multipart: true} do |f|
+  = f.inputs do
+    = render 'form', f: f, attachment: @attachment
+
+    = f.action :submit, input_html: { value: 'Upload File', onclick: "this.disabled=true;this.value='Please wait...';this.form.submit();" }
+
+= link_to 'View All Attachments', attachments_path
+
