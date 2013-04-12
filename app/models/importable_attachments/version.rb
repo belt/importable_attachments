@@ -1,4 +1,3 @@
-#require 'validators/existing_class_validator'
 # versions are managed by the paper_trail gem... providing a history of
 # instance-deltas
 module ImportableAttachments
