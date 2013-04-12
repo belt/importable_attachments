@@ -19,7 +19,7 @@ describe ImportableAttachments::Version do
   context 'validations' do
     it { should have_valid(:item_id).when(nil, 1, 'uniqueId', 'unique_id', 'unique.id') }
 
-    it { should have_valid(:item_type).when(nil, 'Attachment', 'ImportableAttachment::Attachment') }
+    it { should have_valid(:item_type).when(nil, 'Attachment', 'ImportableAttachments::Attachment') }
     it { should_not have_valid(:item_type).when("Test \x0 data") }
   end
 end
