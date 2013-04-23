@@ -6,7 +6,6 @@ module ImportableAttachments
     before_filter :find_parent_by_id, :only => [:show, :edit, :update, :destroy, :download]
     before_filter :find_all_parents, :only => [:index]
     before_filter :generate_parent, :only => [:new]
-    #before_filter :find_children, :only => [ :show ]
     before_filter :set_headers, :only => [:show]
     before_filter :respond_with_instance, :only => [:new, :show, :edit]
 
@@ -104,14 +103,6 @@ module ImportableAttachments
     def generate_parent
       @attachment = Attachment.new
     end
-
-    # :call-seq:
-    # find_children
-    #
-    # yields something
-
-    #def find_children
-    #end
 
     # :call-seq:
     # respond_with_instance
