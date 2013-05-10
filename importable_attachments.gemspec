@@ -45,7 +45,7 @@ Gem::Specification.new do |spec|
   spec.email         = %w(saprb@channing.harvard.edu)
   spec.description   = %q{Easier upload management for ActiveRecord}
   spec.summary       = %q{upload, save-to-disk, attach-to-model_instance, importing}
-  spec.homepage      = 'http://drdev2.bwh.harvard.edu:8000/'
+  spec.homepage      = 'https://github.com/belt/importable_attachments'
   spec.license       = 'MIT'
 
   spec.files         = `git ls-files`.split($/)
