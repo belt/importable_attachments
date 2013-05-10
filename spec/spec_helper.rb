@@ -8,6 +8,11 @@ require 'rspec/autorun'
 # in spec/support/ and its subdirectories.
 Dir[Rails.root.join('spec/support/**/*.rb')].each { |f| require f }
 
+load_schema = lambda {
+  load "#{Rails.root.to_s}/db/schema.rb"
+}
+silence_stream(STDOUT, &load_schema)
+
 RSpec.configure do |config|
   # If true, the base class of anonymous controllers will be inferred
   # automatically. This will be the default behavior in future versions of

@@ -3,13 +3,13 @@ module ImportableAttachments
     module Csv
       attr_accessor :validate_headers, :destructive_import
 
-      # ImportInto suitable attributes translated from a ImportInto::ACTIVITY_RECORD_HEADERS
-      # invertion, based on ACTIVITY_RECORD_HEADERS
+      # ImportInto suitable attributes translated from a ImportInto::RECORD_HEADERS
+      # inversion, based on RECORD_HEADERS
       attr_accessor :converted_headers
 
-      def initialize(params = {})
+      def initialize(attributes = nil, options = {})
         bootstrap
-        super params
+        super(attributes, options)
       end
 
       # :call-seq:
@@ -35,7 +35,7 @@ module ImportableAttachments
       # imports a comma-separated value file
 
       def import_csv
-        return unless try(:attachment) && attachment.present?
+        return unless attachment.present?
         return unless validate_headers && !importable_class_headers_ok?
         transaction do
           send(association_symbol_for_rows).destroy_all if destructive_import
@@ -45,20 +45,24 @@ module ImportableAttachments
       end
 
       # :call-seq:
-      # import_rows params
+      # import_rows *params
       #
-      # imports a CSV file into .people_collection_activity
+      # imports a CSV file into @import_rows_to_class
 
-      def import_rows(*fields)
+      def import_rows(*params)
         sanitize_data!
-        sanitize_data_callback if respond_to? :sanitize_data_callback
 
         importer_opts = {}
-        importer_opts.merge! timestamps: false # adds data to converted_headers and spreadsheet
+        importer_opts.merge! timestamps: true # adds data to converted_headers and spreadsheet
         importer_opts.merge! validate: true
 
-        # .dup else .import modifies coverted_headers and spreadsheet
-        results = @import_rows_to_class.import converted_headers.dup, spreadsheet.dup, importer_opts
+        # .dup else .import modifies converted_headers and spreadsheet
+        if respond_to? :sanitize_data_callback
+          headers, sheet = sanitize_data_callback(converted_headers, spreadsheet)
+        else
+          headers, sheet = converted_headers.dup, spreadsheet.dup
+        end
+        results = @import_rows_to_class.import headers, sheet, importer_opts
         reload
 
         if results && !results.try(:failed_instances).try(:empty?)
@@ -66,7 +70,7 @@ module ImportableAttachments
           opts.merge! import_errors_valid: false
 
           fail_msg = "failed to import #{results.failed_instances.count} record(s)"
-          logger.warn "#{klass.to_s} #{fail_msg}"
+          logger.warn "#{@import_rows_to_class.to_s} #{fail_msg}"
 
           results.failed_instances.each do |failed_row|
             err_msg = "#{failed_row.errors.messages}: #{failed_row.inspect}"
@@ -86,10 +90,10 @@ module ImportableAttachments
       # :call-seq:
       # set_converted_headers
       #
-      # into model attributes representing has_many_attachments ACTIVITY_RECORD_HEADERS
+      # into model attributes representing has_many_attachments RECORD_HEADERS
 
       def set_converted_headers
-        header_conversion_chart = @import_rows_to_class.const_get(:ACTIVITY_RECORD_HEADERS).invert
+        header_conversion_chart = @import_rows_to_class.const_get(:RECORD_HEADERS).invert
         @converted_headers = importable_columns.map { |col| header_conversion_chart[col] }
       end
 
@@ -121,16 +125,22 @@ module ImportableAttachments
       end
 
       # :call-seq:
-      # spreadsheet
+      # read_spreadsheet
       #
       # the "raw" file as processed by CSV
 
+      def read_spreadsheet
+        csv_klass = (defined? FasterCSV) ? FasterCSV : CSV
+        csv_klass.read attachment.io_stream.path
+      end
+
+      # :call-seq:
+      # spreadsheet
+      #
+      # the rows of the file after the first row (headers)
+
       def spreadsheet
-        @spreadsheet ||= if defined? FasterCSV
-                           FasterCSV.read attachment.io_stream.path
-                         else
-                           CSV.read attachment.io_stream.path
-                         end
+        read_spreadsheet[1..-1]
       end
 
       # :call-seq:
@@ -139,7 +149,7 @@ module ImportableAttachments
       # headers for the spreadsheet
 
       def headers
-        @headers ||= spreadsheet.shift
+        read_spreadsheet.first
       end
 
       # :call-seq:

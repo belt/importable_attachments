@@ -18,24 +18,35 @@ ActiveRecord::Schema.define(:version => 100) do
     t.string   "attachable_id"
     t.string   "io_stream_file_name"
     t.string   "io_stream_content_type"
-    t.integer  "io_stream_file_size",    :limit => 8
+    t.integer  "io_stream_file_size", :limit => 8
     t.datetime "io_stream_updated_at"
-    t.datetime "created_at",                          :null => false
-    t.datetime "updated_at",                          :null => false
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
   end
 
-  add_index "attachments", ["attachable_type", "attachable_id"], :name => "idx_importable_attachments_on_attachable_type_and_id"
-  add_index "attachments", ["io_stream_file_name"], :name => "index_attachments_on_io_stream_file_name"
-
-  create_table "importable_attachments_versions", :force => true do |t|
-    t.string   "item_type",  :null => false
-    t.string   "item_id",    :null => false
-    t.string   "event",      :null => false
+  create_table "versions", :force => true do |t|
+    t.string   "item_type", :null => false
+    t.string   "item_id", :null => false
+    t.string   "event", :null => false
     t.string   "whodunnit"
     t.text     "object"
     t.datetime "created_at"
   end
 
-  add_index "importable_attachments_versions", ["item_type", "item_id"], :name => "index_importable_attachments_versions_on_item_type_and_item_id"
+  create_table 'libraries', :force => true do |t|
+    t.string 'name'
+    t.string 'address'
+    t.datetime 'created_at', :null => false
+    t.datetime 'updated_at', :null => false
+  end
+
+  create_table 'books', :force => true do |t|
+    t.string 'title'
+    t.string 'author'
+    t.datetime 'last_checkout_at'
+    t.integer 'library_id', :null => false
+    t.datetime 'created_at', :null => false
+    t.datetime 'updated_at', :null => false
+  end
 
 end
