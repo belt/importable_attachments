@@ -1,6 +1,8 @@
 require 'rails/generators/active_record/migration'
 
+# :nodoc:
 module ImportableAttachments
+  # copies configuration file for configuration.gem
   class InstallGenerator < Rails::Generators::Base
     include Rails::Generators::Migration
     extend ActiveRecord::Generators::Migration
@@ -18,8 +20,8 @@ module ImportableAttachments
     desc 'Runs rspec:paper_trail:install'
 
     def generate_rspec_paper_trail_install
-      return if options.send(:'skip-migrations')
-      cli_opts = options.select { |k, v| v }.map { |k, v| v ? "--#{k}" : v.join(",") }
+      return if skip_migrations?
+      cli_opts = options.select { |key, val| val }.map { |key, val| val ? "--#{key}" : val.join(",") }
       cmd = 'rspec:paper_trail:install ' + cli_opts.join(" ")
       generate cmd
     end
@@ -33,7 +35,7 @@ module ImportableAttachments
     desc 'Runs smarter_dates:install'
 
     def generate_smarter_dates_install
-      cli_opts = options.select { |k, v| v }.map { |k, v| v ? "--#{k}" : v.join(",") }
+      cli_opts = options.select { |key, val| val }.map { |key, val| val ? "--#{key}" : val.join(",") }
       generate 'smarter_dates:install ' + cli_opts.join(" ")
     end
 
@@ -51,6 +53,11 @@ module ImportableAttachments
     end
 
     private
+
+    def skip_migrations?
+      return true if options.send(:'skip-migrations')
+      false
+    end
 
     def use_versioned_filename?
       options.with_revision_in_filename?
