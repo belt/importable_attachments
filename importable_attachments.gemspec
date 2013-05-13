@@ -19,7 +19,8 @@ REQUIREMENTS = {
     formtastic: ['>= 2.2.1'],
     remotipart: ['>= 1.0.5'],
     roo: ['>= 1.10.1'],
-    rails: ['~> 3.2.13'] },
+    rails: ['~> 3.2.13'],
+    :'activerecord-import' => ['~> 0.3.1'] },
   development: {
     bundler: ['~> 1.3'],
     rake: ['>= 0'],
