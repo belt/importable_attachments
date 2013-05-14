@@ -9,6 +9,6 @@
  * compiled file, but it's generally better to create a new file per style scope.
  *
  *= require formtastic
- *= require attachments
+ *= require importable_attachments/attachments
  *= require_self
  */
