@@ -32,6 +32,17 @@ module ImportableAttachments::Base
       delegate :io_stream_file_name, :to => :attachment, :prefix => true
 
       validates :attachment, :associated => true
+      validate do |record|
+        if @columns_not_found
+          attachment.errors.add(:base, "column(s) not found: #{@columns_not_found}")
+          errors.add(:attachment, 'invalid attachment')
+        end
+        if !@row_errors.blank?
+          attachment.errors.add(:base, "failed to import #{@row_errors.length} record(s)")
+          errors.add(:attachment, 'invalid attachment')
+          @row_errors.each {|row| attachment.errors.add(:base, row)}
+        end
+      end
 
       # These go in the class calling has_importable_attachment as they are
       # dependent on mime-type expectations

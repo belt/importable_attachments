@@ -36,11 +36,11 @@ module ImportableAttachments
 
       def import_csv
         return unless attachment.present?
-        return unless validate_headers && !importable_class_headers_ok?
+        return if validate_headers && !importable_class_headers_ok?
         transaction do
           send(association_symbol_for_rows).destroy_all if destructive_import
           #send import_method, Hash[importable_columns.zip(importable_columns)].symbolize_keys!
-          import_rows Hash[importable_columns.zip(importable_columns)].symbolize_keys!
+          raise ActiveRecord::Rollback unless import_rows Hash[importable_columns.zip(importable_columns)].symbolize_keys!
         end
       end
 
@@ -72,17 +72,13 @@ module ImportableAttachments
           fail_msg = "failed to import #{results.failed_instances.count} record(s)"
           logger.warn "#{@import_rows_to_class.to_s} #{fail_msg}"
 
-          results.failed_instances.each do |failed_row|
-            err_msg = "#{failed_row.errors.messages}: #{failed_row.inspect}"
-            logger.warn err_msg
-            attachment.errors.add :base, err_msg unless opts[:import_errors_valid]
-          end
-
-          unless opts[:import_errors_valid]
-            errors.add :attachment, 'invalid attachment'
-            attachment.errors.add :base, fail_msg
-          end
+          @row_errors = results.failed_instances.map {|failed_row| "#{failed_row.errors.messages}: #{failed_row.inspect}"}
+          return nil
+        else
+          @row_errors = []
+          return results
         end
+
       end
 
       protected
@@ -159,9 +155,12 @@ module ImportableAttachments
 
       def importable_class_headers_ok?
         extra_headers = importable_columns.map(&:downcase) - headers
-        unless extra_headers.empty?
-          errors.add :base, "column(s) not found: #{extra_headers.join(', ')}"
-          return
+        if extra_headers.empty?
+          @columns_not_found = nil
+          return true
+        else
+          @columns_not_found = extra_headers.join(', ')
+          return false
         end
       end
 
