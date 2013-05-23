@@ -8,7 +8,8 @@ require 'smarter_dates'
 # An attachment represents a file within the system.
 module ImportableAttachments
   class Attachment < ActiveRecord::Base
-    self.table_name = :attachments
+    self.abstract_class = true
+    self.table_name = :importable_attachments_attachments
 
     include SmarterDates if ::Configuration.for('smarter_dates').enabled
     include Rails::MarkRequirements if ::Configuration.for('mark_requirements').enabled

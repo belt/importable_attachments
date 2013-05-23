@@ -1,5 +1,5 @@
 Paperclip.interpolates :stream_version do |attachment, _|
-
+  attachment.instance.revision_number
 end
 
 Paperclip.interpolates :attachable_klass do |attachment, _|
