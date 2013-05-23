@@ -20,7 +20,9 @@ REQUIREMENTS = {
     remotipart: ['>= 1.0.5'],
     roo: ['>= 1.10.1'],
     rails: ['~> 3.2.13'],
-    :'activerecord-import' => ['~> 0.3.1'] },
+    :'activerecord-import' => ['~> 0.3.1'],
+    :'coffee-script' => ['>= 2.2.0'],
+    :'coffee-rails' => ['>= 3.3.2'] }, # coffee-rails is needed for <= 3.0.x
   development: {
     bundler: ['~> 1.3'],
     rake: ['>= 0'],

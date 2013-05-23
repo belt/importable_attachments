@@ -9,7 +9,8 @@ require 'rspec/autorun'
 Dir[Rails.root.join('spec/support/**/*.rb')].each { |f| require f }
 
 load_schema = lambda {
-  load "#{Rails.root.to_s}/db/schema.rb"
+  ActiveRecord::Migrator.up('db/migrate')
+  ActiveRecord::Migrator.up('spec/dummy/db/migrate')
 }
 silence_stream(STDOUT, &load_schema)
 
