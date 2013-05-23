@@ -19,7 +19,7 @@ class Library < ActiveRecord::Base
     has_importable_attachment spreadsheet_columns: RECORD_HEADERS,
       import_into: :books
     include ImportableAttachments::Importers::Csv
-    validates_with ImportableAttachments::CsvValidator, if: Proc.new { |model| model.attachment.present? }
+    validates_with ImportableAttachments::CsvValidator, if: Proc.new { |model| model.attachment.present? && model.attachment.persisted? }
   end
 
   # --------------------------------------------------------------------------
