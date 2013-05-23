@@ -13,7 +13,7 @@
 
 ActiveRecord::Schema.define(:version => 100) do
 
-  create_table "attachments", :force => true do |t|
+  create_table "importable_attachments_attachments", :force => true do |t|
     t.string   "attachable_type"
     t.string   "attachable_id"
     t.string   "io_stream_file_name"
@@ -24,7 +24,7 @@ ActiveRecord::Schema.define(:version => 100) do
     t.datetime "updated_at", :null => false
   end
 
-  create_table "versions", :force => true do |t|
+  create_table "importable_attachments_versions", :force => true do |t|
     t.string   "item_type", :null => false
     t.string   "item_id", :null => false
     t.string   "event", :null => false

@@ -2,6 +2,8 @@
 # instance-deltas
 module ImportableAttachments
   class Version < ActiveRecord::Base
+    self.abstract_class = true
+    self.table_name = :importable_attachments_versions
     attr_accessible :event, :item_id, :item_type, :object, :object_changes, :whodunnit
 
     include SmarterDates if ::Configuration.for('smarter_dates').enabled
