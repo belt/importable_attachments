@@ -13,33 +13,50 @@ module ImportableAttachments::Base
       lopt = {import_method: :import_rows}
       lopt.merge! options
 
+      validate_importable_attachment_options lopt
+      install_importable_attachment_options lopt
+      install_importable_attachment_associations
+      install_importable_attachment_validations
+      install_importable_attachment_assignment_protection
+
+      include InstanceMethods
+
+      # TODO: make this configurable
+      after_save :import_attachment
+    end
+
+    def validate_importable_attachment_options(options)
       [:spreadsheet_columns, :import_into].each do |sym|
-        raise RuntimeError, "has_importable_attachment: needs :#{sym}" unless lopt.has_key? sym
+        raise RuntimeError, "has_importable_attachment: needs :#{sym}" unless options.has_key? sym
       end
 
-      unless lopt[:spreadsheet_columns].is_a?(Enumerable)
+      unless options[:spreadsheet_columns].is_a?(Enumerable)
         raise RuntimeError, 'has_importable_attachment: :spreadsheet_columns must be Enumerable'
       end
+    end
 
+    def install_importable_attachment_options(options)
       [:import_method, :import_into, :spreadsheet_columns].each do |sym|
         cattr_accessor sym
-        self.send("#{sym}=".to_sym, lopt[sym])
+        self.send("#{sym}=".to_sym, options[sym])
       end
+    end
 
+    def install_importable_attachment_associations
       has_one :attachment, :dependent => :nullify, :as => :attachable
       delegate :io_stream, :to => :attachment, :prefix => true
       delegate :io_stream_url, :to => :attachment, :prefix => true
       delegate :io_stream_file_name, :to => :attachment, :prefix => true
+    end
 
+    def install_importable_attachment_validations
       validates :attachment, :associated => true
       validate do |record|
         if @columns_not_found
-          attachment.errors.add(:base, "column(s) not found: #{@columns_not_found}")
-          errors.add(:attachment, 'invalid attachment')
+          invalid_attachment_error "column(s) not found: #{@columns_not_found}"
         end
         if !@row_errors.blank?
-          attachment.errors.add(:base, "failed to import #{@row_errors.length} record(s)")
-          errors.add(:attachment, 'invalid attachment')
+          invalid_attachment_error "failed to import #{@row_errors.length} record(s)"
           @row_errors.each {|row| attachment.errors.add(:base, row)}
         end
       end
@@ -48,15 +65,12 @@ module ImportableAttachments::Base
       # dependent on mime-type expectations
       #validates_with CsvValidator, :if => Proc.new {|model| model.attachment.present?}
       #validates_with ExcelValidator, :if => Proc.new {|model| model.attachment.present?}
+    end
 
+    def install_importable_attachment_assignment_protection
       attr_accessible :attachment, :attachment_attributes, :attachment_id
       accepts_nested_attributes_for :attachment, :allow_destroy => true,
         :reject_if => :all_blank
-
-      include InstanceMethods
-
-      # TODO: make this configurable
-      after_save :import_attachment
     end
   end
 
@@ -84,6 +98,11 @@ module ImportableAttachments::Base
       return unless self.attachment
       logger.debug "[himportable_attachments] .import_rows #{opts}"
       raise RuntimeError, '[importable_attachments] .import_rows not implemented'
+    end
+
+    def invalid_attachment_error(msg)
+      attachment.errors.add(:base, msg)
+      errors.add(:attachment, 'invalid attachment')
     end
   end
 end
