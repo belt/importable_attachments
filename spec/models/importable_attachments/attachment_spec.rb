@@ -100,7 +100,7 @@ describe ImportableAttachments::Attachment do
       attachment.magic_mime_type.should be_nil
     end
 
-    it 'should identify the file mime_type as Excel' do
+    it 'should identify the file mime_type as CSV' do
       attachment = ImportableAttachments::Attachment.create! :io_stream => File.new(@spec_file, 'rb')
       attachment.magic_mime_type.should == 'text/plain'
       attachment.io_stream.content_type.should == 'text/csv'
