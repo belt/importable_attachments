@@ -14,7 +14,15 @@ module ImportableAttachments
         assoc = self.class.import_into
         import_method = self.class.import_method
         return unless attachment.present?
-        spreadsheet = ::Excel.new(attachment.io_stream.path)
+
+        stream = attachment.io_stream
+        stream_path = if stream.exists?
+          stream.path
+        else
+          stream.queued_for_write[:original].path
+        end
+        spreadsheet = ::Excel.new stream_path
+
         spreadsheet.default_sheet = spreadsheet.sheets.first
         headers = (1..column_names.length).map { |n| spreadsheet.cell(1, n).try(:downcase) }
         return unless headers == column_names.map(&:downcase)
