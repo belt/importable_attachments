@@ -1,7 +1,7 @@
 module ImportableAttachments
   module Importers
     module Csv
-      attr_accessor :validate_headers, :destructive_import
+      attr_accessor :validate_headers, :destructive_import, :validate_on_import
 
       # ImportInto suitable attributes translated from a ImportInto::RECORD_HEADERS
       # inversion, based on RECORD_HEADERS
@@ -23,7 +23,7 @@ module ImportableAttachments
       def bootstrap
         @import_rows_to_class = association_symbol_for_rows.to_s.classify.constantize
         @validate_headers = true
-        @validate_on_import = true
+        @validate_on_import = ::Configuration.for('attachments').validate_on_import
         @destructive_import = true
         @timestamp_import = true
         @converted_headers = set_converted_headers
@@ -54,7 +54,7 @@ module ImportableAttachments
 
         importer_opts = {}
         importer_opts.merge! timestamps: true # adds data to converted_headers and spreadsheet
-        importer_opts.merge! validate: true
+        importer_opts.merge! validate: validate_on_import
 
         # .dup else .import modifies converted_headers and spreadsheet
         if respond_to? :sanitize_data_callback
