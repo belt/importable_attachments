@@ -127,7 +127,12 @@ module ImportableAttachments
 
       def read_spreadsheet
         csv_klass = (defined? FasterCSV) ? FasterCSV : CSV
-        csv_klass.read attachment.io_stream.path
+        stream = attachment.io_stream
+        if stream.exists?
+          csv_klass.read stream.path
+        else
+          csv_klass.read stream.queued_for_write[:original].path
+        end
       end
 
       # :call-seq:
