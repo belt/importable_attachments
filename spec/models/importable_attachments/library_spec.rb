@@ -35,7 +35,7 @@ describe Library do
         subject.books.should be_empty
         lambda {
           subject.attachment = @attachment
-        }.should change(subject.books, :count)
+        }.should change(subject.books, :count).by(5)
       end
     end
 
