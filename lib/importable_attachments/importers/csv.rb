@@ -63,7 +63,7 @@ module ImportableAttachments
           headers, sheet = converted_headers.dup, spreadsheet.dup
         end
         results = @import_rows_to_class.import headers, sheet, importer_opts
-        reload
+        reload if persisted?
 
         if results && !results.try(:failed_instances).try(:empty?)
           opts = {}
