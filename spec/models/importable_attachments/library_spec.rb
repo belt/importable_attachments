@@ -122,6 +122,16 @@ describe Library do
         }.should_not change(subject.attachment, :io_stream_file_name)
       end
     end
+
+    context 'updating when an attachment already exists with destructive import' do
+      it 'should delete the rows from old file and replace them with rows from new file' do
+        subject.attachment = @attachment
+        attachment = Attachment.new io_stream: File.new(spec_file('books2.csv'), 'rb')
+        lambda {
+          subject.attachment = attachment
+        }.should change(subject.books, :count).by(-2)
+      end
+    end
   end
 
 end
