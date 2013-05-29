@@ -21,8 +21,8 @@ module ImportableAttachments::Base
 
       include InstanceMethods
 
-      # TODO: make this configurable
-      after_save :import_attachment
+      # for assigning attachment to new record
+      after_create :import_attachment
     end
 
     def validate_importable_attachment_options(options)
