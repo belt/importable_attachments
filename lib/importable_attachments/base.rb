@@ -96,7 +96,7 @@ module ImportableAttachments::Base
 
     def import_rows(*opts)
       return unless self.attachment
-      logger.debug "[himportable_attachments] .import_rows #{opts}"
+      logger.debug "[importable_attachments] .import_rows #{opts}"
       raise RuntimeError, '[importable_attachments] .import_rows not implemented'
     end
 
