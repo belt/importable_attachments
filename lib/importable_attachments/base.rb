@@ -21,8 +21,8 @@ module ImportableAttachments::Base
 
       include InstanceMethods
 
-      # TODO: make this configurable
-      after_save :import_attachment
+      # for assigning attachment to new record
+      after_create :import_attachment
     end
 
     def validate_importable_attachment_options(options)
@@ -96,7 +96,7 @@ module ImportableAttachments::Base
 
     def import_rows(*opts)
       return unless self.attachment
-      logger.debug "[himportable_attachments] .import_rows #{opts}"
+      logger.debug "[importable_attachments] .import_rows #{opts}"
       raise RuntimeError, '[importable_attachments] .import_rows not implemented'
     end
 

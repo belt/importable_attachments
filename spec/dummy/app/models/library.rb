@@ -7,11 +7,6 @@ class Library < ActiveRecord::Base
     has_paper_trail ignore: [:updated_at]
   end
 
-  def attachment=(params)
-    super params
-    import_attachment if attachment && attachment.valid?
-  end
-
   RECORD_HEADERS = ['title', 'author', 'last checkout at']
 
   if ::Configuration.for('attachments').enabled

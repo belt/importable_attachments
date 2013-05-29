@@ -132,6 +132,23 @@ describe Library do
         }.should change(subject.books, :count).by(-2)
       end
     end
+
+    context 'assigning attachment to new record' do
+      subject { Library.new(name: 'XYZ Library', address: '123 Main St.') }
+
+      it 'should not import when the record is not persisted' do
+        lambda {
+          subject.attachment = @attachment
+        }.should_not change(subject.books, :count)
+      end
+
+      it 'should import upon saving the record' do
+        lambda {
+          subject.attachment = @attachment
+          subject.save
+        }.should change(subject.books, :count).by(5)
+      end
+    end
   end
 
 end
