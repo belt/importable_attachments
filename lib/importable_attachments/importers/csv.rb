@@ -30,6 +30,17 @@ module ImportableAttachments
       end
 
       # :call-seq:
+      # attachment= params
+      #
+      # imports an attachment upon assignment if the record is persisted
+      # (if not, after_create hook will import)
+
+      def attachment=(params)
+        super params
+        import_attachment if persisted? && attachment && attachment.valid?
+      end
+
+      # :call-seq:
       # import_csv
       #
       # imports a comma-separated value file
