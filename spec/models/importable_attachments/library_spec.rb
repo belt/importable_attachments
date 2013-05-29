@@ -35,7 +35,7 @@ describe Library do
         subject.books.should be_empty
         lambda {
           subject.attachment = @attachment
-        }.should change(subject.books, :count)
+        }.should change(subject.books, :count).by(5)
       end
     end
 
@@ -120,6 +120,33 @@ describe Library do
         lambda {
           subject.attachment = attachment
         }.should_not change(subject.attachment, :io_stream_file_name)
+      end
+    end
+
+    context 'updating when an attachment already exists with destructive import' do
+      it 'should delete the rows from old file and replace them with rows from new file' do
+        subject.attachment = @attachment
+        attachment = Attachment.new io_stream: File.new(spec_file('books2.csv'), 'rb')
+        lambda {
+          subject.attachment = attachment
+        }.should change(subject.books, :count).by(-2)
+      end
+    end
+
+    context 'assigning attachment to new record' do
+      subject { Library.new(name: 'XYZ Library', address: '123 Main St.') }
+
+      it 'should not import when the record is not persisted' do
+        lambda {
+          subject.attachment = @attachment
+        }.should_not change(subject.books, :count)
+      end
+
+      it 'should import upon saving the record' do
+        lambda {
+          subject.attachment = @attachment
+          subject.save
+        }.should change(subject.books, :count).by(5)
       end
     end
   end
