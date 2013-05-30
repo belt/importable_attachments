@@ -21,7 +21,7 @@ module ImportableAttachments
         else
           stream.queued_for_write[:original].path
         end
-        spreadsheet = ::Excel.new stream_path
+        spreadsheet = Roo::Excel.new stream_path
 
         spreadsheet.default_sheet = spreadsheet.sheets.first
         headers = (1..column_names.length).map { |n| spreadsheet.cell(1, n).try(:downcase) }
