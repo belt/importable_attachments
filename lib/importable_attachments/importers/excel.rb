@@ -30,7 +30,6 @@ module ImportableAttachments
         2.upto(spreadsheet.last_row) do |line|
           self.send(import_method, *(1..column_names.length).map { |n| spreadsheet.cell(line, n) })
         end
-        spreadsheet.remove_tmp
       end
 
     end
