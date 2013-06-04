@@ -9,6 +9,9 @@ module ImportableAttachments
       # inversion, based on RECORD_HEADERS
       attr_accessor :converted_headers
 
+      # stores the parsed-file for later processing
+      attr_accessor :attachment_as_ruby
+
       def initialize(attributes = nil, options = {})
         bootstrap
         super(attributes, options)
@@ -39,7 +42,7 @@ module ImportableAttachments
 
       def attachment=(params)
         super params
-        import_attachment if persisted? && attachment && attachment.valid?
+        import_attachment if persisted? && attachment.try(:valid?)
       end
 
       # : call-seq:
@@ -73,9 +76,9 @@ module ImportableAttachments
 
         # .dup else .import modifies converted_headers and spreadsheet
         if respond_to? :sanitize_data_callback
-          headers, sheet = sanitize_data_callback(converted_headers, spreadsheet)
+          headers, sheet = sanitize_data_callback(@converted_headers, spreadsheet)
         else
-          headers, sheet = converted_headers.dup, spreadsheet.dup
+          headers, sheet = @converted_headers.dup, spreadsheet.dup
         end
         results = @import_rows_to_class.import headers, sheet, importer_opts
         reload if persisted?
@@ -138,25 +141,36 @@ module ImportableAttachments
       # :call-seq:
       # read_spreadsheet
       #
-      # sets @spreadsheet_data to the raw file as processed by roo if the file can be read
+      # sets @attachment_as_ruby to the raw file as processed by roo if the file can be read
 
       def read_spreadsheet
-        stream = attachment.io_stream
-        stream_path = if stream.exists?
-          stream.path
-        else
-          stream.queued_for_write[:original].path
-        end
-        extension = stream_path.split('.').last
-        if !%w(xls xlsx ods xml csv).member?(extension) # required for roo - it checks file extension
-          @invalid_extension = extension
-          @spreadsheet_data = nil
+        if !%w(xls xlsx ods xml csv).member?(stream_extension) # required for roo - it checks file extension
+          @invalid_extension = stream_extension
         else
           @invalid_extension = nil
           spreadsheet = Roo::Spreadsheet.open stream_path
-          @spreadsheet_data = spreadsheet.parse
+          @attachment_as_ruby = spreadsheet.parse
         end
-        @spreadsheet_data
+        @attachment_as_ruby
+      end
+
+      # :call-seq:
+      # stream_path
+      #
+      # yields path for a readable file, saved or not
+
+      def stream_path
+        @stream = attachment.io_stream
+        @stream.exists? ? @stream.path : @stream.queued_for_write[:original].path
+      end
+
+      # :call-seq:
+      # stream_extension
+      #
+      # yields extension for file
+
+      def stream_extension
+        stream_path.split('.').last
       end
 
       # :call-seq:
@@ -165,7 +179,7 @@ module ImportableAttachments
       # the rows of the file after the first row (headers)
 
       def spreadsheet
-        @spreadsheet_data[1..-1]
+        @attachment_as_ruby[1..-1]
       end
 
       # :call-seq:
@@ -174,7 +188,7 @@ module ImportableAttachments
       # headers for the spreadsheet
 
       def headers
-        @spreadsheet_data.first
+        @attachment_as_ruby.first
       end
 
       # :call-seq:
@@ -208,11 +222,14 @@ module ImportableAttachments
       # translates English date-ish and-or time-ish language into DateTime instances
 
       def convert_datetimes_intelligently!
-        dt_attrs = converted_headers.select { |obj| obj.match(/_(?:dt?|at|on)\z/) }
-        dt_idxs = dt_attrs.map { |obj| converted_headers.find_index(obj) }
+        dt_attrs = @converted_headers.select { |obj| obj.match(/_(?:dt?|at|on)\z/) }
+        dt_idxs = dt_attrs.map { |obj| @converted_headers.find_index(obj) }
 
         spreadsheet.map! { |row|
-          dt_idxs.each { |idx| row[idx] = row[idx].try(:to_datetime) || row[idx] }
+          dt_idxs.each { |idx|
+            to_convert = row[idx]
+            row[idx] = to_convert.try(:to_datetime) || to_convert
+          }
           row }
       end
 
