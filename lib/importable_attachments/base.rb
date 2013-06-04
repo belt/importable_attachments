@@ -1,3 +1,4 @@
+require 'importable_attachments/importers/importer'
 module ImportableAttachments::Base
   module ClassMethods
 
@@ -20,6 +21,7 @@ module ImportableAttachments::Base
       install_importable_attachment_assignment_protection
 
       include InstanceMethods
+      include ImportableAttachments::Importers::Importer
 
       # for assigning attachment to new record
       after_create :import_attachment
@@ -52,6 +54,9 @@ module ImportableAttachments::Base
     def install_importable_attachment_validations
       validates :attachment, :associated => true
       validate do |record|
+        if @invalid_extension
+          invalid_attachment_error "invalid extension: .#{@invalid_extension}"
+        end
         if @columns_not_found
           invalid_attachment_error "column(s) not found: #{@columns_not_found}"
         end
@@ -61,10 +66,6 @@ module ImportableAttachments::Base
         end
       end
 
-      # These go in the class calling has_importable_attachment as they are
-      # dependent on mime-type expectations
-      #validates_with CsvValidator, :if => Proc.new {|model| model.attachment.present?}
-      #validates_with ExcelValidator, :if => Proc.new {|model| model.attachment.present?}
     end
 
     def install_importable_attachment_assignment_protection
@@ -76,29 +77,9 @@ module ImportableAttachments::Base
 
   module InstanceMethods
     # : call-seq:
-    # import_attachment
+    # invalid_attachment_error msg
     #
-    # imports an attachment of a given mime-type (data-stream to ruby),
-    # calls import_rows with a ruby data-store
-    #
-    # NOTE: this is a stub
-
-    def import_attachment
-      raise RuntimeError, '[importable_attachments] .import_attachment not implemented'
-    end
-
-    # : call-seq:
-    # import_rows params
-    #
-    # imports an attachment contents into :import_into association
-    #
-    # NOTE: this is a stub
-
-    def import_rows(*opts)
-      return unless self.attachment
-      logger.debug "[importable_attachments] .import_rows #{opts}"
-      raise RuntimeError, '[importable_attachments] .import_rows not implemented'
-    end
+    # adds errors to base record and attachment
 
     def invalid_attachment_error(msg)
       attachment.errors.add(:base, msg)
