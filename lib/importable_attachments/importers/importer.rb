@@ -1,11 +1,16 @@
+require 'roo'
+
 module ImportableAttachments
   module Importers
-    module Csv
+    module Importer
       attr_accessor :validate_headers, :destructive_import, :validate_on_import
 
       # ImportInto suitable attributes translated from a ImportInto::RECORD_HEADERS
       # inversion, based on RECORD_HEADERS
       attr_accessor :converted_headers
+
+      # stores the parsed-file for later processing
+      attr_accessor :attachment_as_ruby
 
       def initialize(attributes = nil, options = {})
         bootstrap
@@ -37,16 +42,18 @@ module ImportableAttachments
 
       def attachment=(params)
         super params
-        import_attachment if persisted? && attachment && attachment.valid?
+        import_attachment if persisted? && attachment.try(:valid?)
       end
 
-      # :call-seq:
-      # import_csv
+      # : call-seq:
+      # import_attachment
       #
-      # imports a comma-separated value file
+      # imports an attachment of a given mime-type (data-stream to ruby),
+      # calls import_rows with a ruby data-store
 
-      def import_csv
+      def import_attachment
         return unless attachment.present?
+        return unless read_spreadsheet
         return if validate_headers && !importable_class_headers_ok?
         transaction do
           send(association_symbol_for_rows).destroy_all if destructive_import
@@ -69,9 +76,9 @@ module ImportableAttachments
 
         # .dup else .import modifies converted_headers and spreadsheet
         if respond_to? :sanitize_data_callback
-          headers, sheet = sanitize_data_callback(converted_headers, spreadsheet)
+          headers, sheet = sanitize_data_callback(@converted_headers, spreadsheet)
         else
-          headers, sheet = converted_headers.dup, spreadsheet.dup
+          headers, sheet = @converted_headers.dup, spreadsheet.dup
         end
         results = @import_rows_to_class.import headers, sheet, importer_opts
         reload if persisted?
@@ -134,16 +141,36 @@ module ImportableAttachments
       # :call-seq:
       # read_spreadsheet
       #
-      # the "raw" file as processed by CSV
+      # sets @attachment_as_ruby to the raw file as processed by roo if the file can be read
 
       def read_spreadsheet
-        csv_klass = (defined? FasterCSV) ? FasterCSV : CSV
-        stream = attachment.io_stream
-        if stream.exists?
-          csv_klass.read stream.path
+        if !%w(xls xlsx ods xml csv).member?(stream_extension) # required for roo - it checks file extension
+          @invalid_extension = stream_extension
         else
-          csv_klass.read stream.queued_for_write[:original].path
+          @invalid_extension = nil
+          spreadsheet = Roo::Spreadsheet.open stream_path
+          @attachment_as_ruby = spreadsheet.parse
         end
+        @attachment_as_ruby
+      end
+
+      # :call-seq:
+      # stream_path
+      #
+      # yields path for a readable file, saved or not
+
+      def stream_path
+        @stream = attachment.io_stream
+        @stream.exists? ? @stream.path : @stream.queued_for_write[:original].path
+      end
+
+      # :call-seq:
+      # stream_extension
+      #
+      # yields extension for file
+
+      def stream_extension
+        stream_path.split('.').last
       end
 
       # :call-seq:
@@ -152,7 +179,7 @@ module ImportableAttachments
       # the rows of the file after the first row (headers)
 
       def spreadsheet
-        read_spreadsheet[1..-1]
+        @attachment_as_ruby[1..-1]
       end
 
       # :call-seq:
@@ -161,7 +188,7 @@ module ImportableAttachments
       # headers for the spreadsheet
 
       def headers
-        read_spreadsheet.first
+        @attachment_as_ruby.first
       end
 
       # :call-seq:
@@ -195,11 +222,14 @@ module ImportableAttachments
       # translates English date-ish and-or time-ish language into DateTime instances
 
       def convert_datetimes_intelligently!
-        dt_attrs = converted_headers.select { |obj| obj.match(/_(?:dt?|at|on)\z/) }
-        dt_idxs = dt_attrs.map { |obj| converted_headers.find_index(obj) }
+        dt_attrs = @converted_headers.select { |obj| obj.match(/_(?:dt?|at|on)\z/) }
+        dt_idxs = dt_attrs.map { |obj| @converted_headers.find_index(obj) }
 
         spreadsheet.map! { |row|
-          dt_idxs.each { |idx| row[idx] = row[idx].try(:to_datetime) || row[idx] }
+          dt_idxs.each { |idx|
+            to_convert = row[idx]
+            row[idx] = to_convert.try(:to_datetime) || to_convert
+          }
           row }
       end
 
