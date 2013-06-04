@@ -148,7 +148,7 @@ module ImportableAttachments
           stream.queued_for_write[:original].path
         end
         extension = stream_path.split('.').last
-        if !%w(xls xlsx ods xml csv).member?(extension)
+        if !%w(xls xlsx ods xml csv).member?(extension) # required for roo - it checks file extension
           @invalid_extension = extension
           @spreadsheet_data = nil
         else
