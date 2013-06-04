@@ -151,5 +151,19 @@ describe Library do
     end
   end
 
+  context 'importing excel file' do
+    before :each do
+      @attachment = Attachment.new io_stream: File.new(spec_file('books.xls'), 'rb')
+    end
+
+    subject { Library.create(name: 'XYZ Library', address: '123 Main St.') }
+
+    it 'should import a spreadsheet if it is in the right format' do
+        subject.books.should be_empty
+        lambda {
+          subject.attachment = @attachment
+        }.should change(subject.books, :count).by(5)
+    end
+  end
 end
 

@@ -1,5 +1,3 @@
-require 'importable_attachments/importers'
-
 class Library < ActiveRecord::Base
   include SmarterDates if ::Configuration.for('smarter_dates').enabled
 
@@ -13,8 +11,6 @@ class Library < ActiveRecord::Base
     extend ImportableAttachments::Base::ClassMethods
     has_importable_attachment spreadsheet_columns: RECORD_HEADERS,
       import_into: :books
-    include ImportableAttachments::Importers::Csv
-    validates_with ImportableAttachments::CsvValidator, if: Proc.new { |model| model.attachment.present? && model.attachment.persisted? }
   end
 
   # --------------------------------------------------------------------------
@@ -34,16 +30,6 @@ class Library < ActiveRecord::Base
 
   # --------------------------------------------------------------------------
   # define: behaviors
-
-  # : call-seq:
-  # import_attachment
-  #
-  # imports an attachment of a given mime-type (data-stream to ruby),
-  # calls import_rows with a ruby data-store
-
-  def import_attachment
-    import_csv
-  end
 
   protected
 
