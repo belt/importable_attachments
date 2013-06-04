@@ -1,6 +1,8 @@
+require 'roo'
+
 module ImportableAttachments
   module Importers
-    module Csv
+    module Importer
       attr_accessor :validate_headers, :destructive_import, :validate_on_import
 
       # ImportInto suitable attributes translated from a ImportInto::RECORD_HEADERS
@@ -40,13 +42,15 @@ module ImportableAttachments
         import_attachment if persisted? && attachment && attachment.valid?
       end
 
-      # :call-seq:
-      # import_csv
+      # : call-seq:
+      # import_attachment
       #
-      # imports a comma-separated value file
+      # imports an attachment of a given mime-type (data-stream to ruby),
+      # calls import_rows with a ruby data-store
 
-      def import_csv
+      def import_attachment
         return unless attachment.present?
+        return unless read_spreadsheet
         return if validate_headers && !importable_class_headers_ok?
         transaction do
           send(association_symbol_for_rows).destroy_all if destructive_import
@@ -134,16 +138,25 @@ module ImportableAttachments
       # :call-seq:
       # read_spreadsheet
       #
-      # the "raw" file as processed by CSV
+      # sets @spreadsheet_data to the raw file as processed by roo if the file can be read
 
       def read_spreadsheet
-        csv_klass = (defined? FasterCSV) ? FasterCSV : CSV
         stream = attachment.io_stream
-        if stream.exists?
-          csv_klass.read stream.path
+        stream_path = if stream.exists?
+          stream.path
         else
-          csv_klass.read stream.queued_for_write[:original].path
+          stream.queued_for_write[:original].path
         end
+        extension = stream_path.split('.').last
+        if !%w(xls xlsx ods xml csv).member?(extension) # required for roo - it checks file extension
+          @invalid_extension = extension
+          @spreadsheet_data = nil
+        else
+          @invalid_extension = nil
+          spreadsheet = Roo::Spreadsheet.open stream_path
+          @spreadsheet_data = spreadsheet.parse
+        end
+        @spreadsheet_data
       end
 
       # :call-seq:
@@ -152,7 +165,7 @@ module ImportableAttachments
       # the rows of the file after the first row (headers)
 
       def spreadsheet
-        read_spreadsheet[1..-1]
+        @spreadsheet_data[1..-1]
       end
 
       # :call-seq:
@@ -161,7 +174,7 @@ module ImportableAttachments
       # headers for the spreadsheet
 
       def headers
-        read_spreadsheet.first
+        @spreadsheet_data.first
       end
 
       # :call-seq:
