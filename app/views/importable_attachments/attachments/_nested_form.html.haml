@@ -11,7 +11,8 @@
 
 %li
   %label.label File name
-  %input#file_name{disabled: 'disabled', value: attachment.io_stream_file_name}
+  #file_name.a.input{href: '#', :data => {:value => attachment.io_stream_file_name}}
+    = io_stream_file_name_field_text f.object
   = f.inputs id: 'attachment_attributes_io_stream_fields' do
     - opts = { as: :file, id: 'attachment_io_stream_input' }
     = f.semantic_fields_for :attachment do |attachment_form|
