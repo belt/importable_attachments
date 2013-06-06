@@ -197,7 +197,7 @@ module ImportableAttachments
       # requesting to import headers that are not found in the spreadsheet
 
       def importable_class_headers_ok?
-        extra_headers = importable_columns.map(&:downcase) - headers
+        extra_headers = importable_columns - headers
         if extra_headers.empty?
           @columns_not_found = nil
           return true
