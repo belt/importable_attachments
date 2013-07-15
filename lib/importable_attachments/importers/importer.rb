@@ -170,7 +170,7 @@ module ImportableAttachments
       # yields extension for file
 
       def stream_extension
-        stream_path.split('.').last
+        stream_path.split('.').last.downcase
       end
 
       # :call-seq:
