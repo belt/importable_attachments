@@ -11,7 +11,7 @@ REQUIREMENTS = {
     paper_trail: ['~> 2.7.1'],
     paperclip: ['~> 3.4.2'],
     configuration: ['~> 1.3.2'],
-    smarter_dates: ['~> 0.2.14'],
+    smarter_dates: ['~> 0.2.15'],
     :'ruby-filemagic' => ['~> 0.4.2'],
     :'rspec-paper_trail' => ['~> 0.0.10'],
     :'rails-mark_requirements' => ['~> 0.0.1'],
