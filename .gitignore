@@ -2,6 +2,8 @@
 *.rbc
 *.sassc
 .rspec
+.ruby-gemset
+.ruby-version
 .rvmrc
 .sass-cache?
 /.bundle
@@ -12,8 +14,8 @@
 /spec/dummy/.sass-cache
 /spec/dummy/db/*.sqlite3
 /spec/dummy/log/*.log
-/spec/dummy/tmp/
 /spec/dummy/public/system/
+/spec/dummy/tmp/
 /spec/tmp/*
 /tmp/*
 /vendor/bundle
